@@ -14,6 +14,9 @@ Use these prompts *after* you have a first draft. They're designed to be applied
 - [Audience Calibration](#audience-calibration)
 - [Tone and Voice](#tone-and-voice)
 - [Length Reduction](#length-reduction)
+- [Improving Examples](#improving-examples)
+- [Titles and Metadata](#titles-and-metadata)
+- [Consistency and Continuity](#consistency-and-continuity)
 
 ---
 
@@ -71,6 +74,25 @@ Restructure it so a reader can get the key point in 10 seconds by skimming. Opti
 - Use a numbered list if there's a sequence
 
 Choose the format that best matches the content type, and apply it.
+```
+
+### Add a Key Takeaways Summary
+
+```
+This post dives into the detail quickly, but some readers want the conclusions before committing
+to reading the full thing.
+
+[Paste the full post or a summary of main sections]
+
+Add a "Key Takeaways" callout box near the top (after the intro, before the first section):
+
+> **Key Takeaways**
+> - [The most actionable thing — what a reader can do today]
+> - [The most surprising finding or counterintuitive result]
+> - [Who should apply this and under what conditions]
+
+Each bullet should be one sentence. No jargon — this is the version someone skims on Slack
+before deciding whether to read further.
 ```
 
 ---
@@ -169,6 +191,38 @@ Expand it to cover:
 3. The specific behaviour to watch for in production
 
 Target: 150–250 words for this section. Don't pad — add substance.
+```
+
+### Add Security Considerations
+
+```
+This section doesn't mention security implications, and there are some the reader should know.
+
+[Paste the section]
+
+Add a callout block (⚠️ Security Note) covering:
+- The permission or trust boundary this code touches
+- The input validation or sanitisation that's required
+- Any credentials, tokens, or secrets that must not be hardcoded
+- What happens if this is misused or the underlying assumption breaks
+
+Base this on our actual security requirements: [paste any relevant constraints or policies].
+```
+
+### Add "What Happens If You Don't Do This"
+
+```
+This section explains the right approach but not the consequence of skipping it. Readers may
+deprioritise it if they don't understand what's at stake.
+
+[Paste the section]
+
+Add a 2–3 sentence paragraph before the recommendation that describes:
+- What a team that skips this step typically experiences
+- When the consequence shows up (immediately vs. months later in production)
+- How bad it usually gets before they notice
+
+This is the "why bother" that motivates readers to actually follow the guidance.
 ```
 
 ---
@@ -390,4 +444,270 @@ Analyse the draft and recommend:
 3. Any examples that duplicate each other
 
 Don't make the cuts yet — just tell me what to consider cutting and why, so I can make the final call.
+```
+
+### Split Into Two Posts
+
+```
+This post is trying to cover too much. It would be stronger as two separate, focused posts.
+
+[Paste the full draft]
+
+Suggest a clean split:
+1. Where would you draw the line? (which section becomes the end of post 1 and start of post 2?)
+2. What title would each post have?
+3. What would each post's TL;DR be?
+4. Is there anything that needs to appear in both posts (shared context, definitions)?
+
+The goal is for each post to stand alone — a reader of post 2 shouldn't need to have read post 1.
+```
+
+---
+
+## Improving Examples
+
+Use these prompts when examples in the draft are too generic, too complex, or don't clearly
+illustrate the concept they're meant to support.
+
+### Replace a Generic Placeholder with a Team-Specific Example
+
+```
+This code example uses placeholder names that don't match our codebase — it reads like tutorial
+documentation rather than something from our system.
+
+[Paste the generic example]
+
+OUR ACTUAL CODEBASE CONTEXT:
+- Service names: [list your real service names]
+- Common data models: [e.g., Order, User, Product, Event]
+- Standard libraries we use: [e.g., SQLAlchemy, Pydantic, boto3]
+- Internal conventions: [e.g., how we name functions, structure handlers]
+
+Rewrite the example so it looks like it came from our actual system. Use realistic names from
+our domain, our import conventions, and our typical file structure. Don't change what the
+example demonstrates — only make the context feel familiar to our team.
+```
+
+### Add a Motivated Introduction to a Code Example
+
+```
+This code example appears without setup. A reader seeing it for the first time doesn't know:
+- What problem they're solving by running this code
+- What state the system should be in before this runs
+- What a successful result looks like
+
+[Paste the code example]
+
+Add:
+1. One sentence before the code: the specific scenario that requires this. Not "here is how to
+   do X" — describe the situation: "when you need to X because Y happens..."
+2. A comment at the top of the code: # Assumes: [prerequisite state]
+3. A comment at the bottom or a following sentence showing: # Result: [what you see or what changes]
+```
+
+### Convert a Single Example Into a Minimal and Full Version
+
+```
+This code example is trying to do two things: introduce the concept AND show a real-world usage.
+It's too complex for newcomers but too simplified for experienced readers.
+
+[Paste the example]
+
+Split it into two code blocks:
+
+MINIMAL EXAMPLE (≤15 lines):
+- Only the core concept, no real-world complexity
+- Add a comment: # Minimal example — see below for production version
+
+FULL EXAMPLE:
+- The realistic version with error handling, logging, and configuration
+- Add a comment: # Production version — adds [error handling / config loading / logging]
+
+Add one sentence between them explaining what was added and why.
+```
+
+### Add a Counterexample
+
+```
+This section only shows the correct way to do something. A counterexample — the wrong approach
+and why it fails — would help readers recognise the mistake in their own code and understand
+why the correct approach matters.
+
+[Paste the section with the correct example]
+
+THE COMMON MISTAKE:
+[Describe the most common alternative approach, or paste an example of the wrong code]
+
+Add a "Don't do this" block that shows:
+- The incorrect or naive approach
+- A comment or note explaining what goes wrong — be specific ("this will silently drop messages
+  when the queue is full" not just "this is wrong")
+- A pointer back to the correct approach
+
+Format with a ⚠️ callout or a code block with a # DON'T comment at the top.
+```
+
+### Add a "How to Verify This Worked" Step
+
+```
+This example shows how to implement something but not how to confirm it's working correctly.
+Readers will copy the code and then be unsure whether it's doing what they expect.
+
+[Paste the example or section]
+
+Add a short "Verify it's working" block after the main example showing:
+1. The command or check to run after implementation
+2. What the expected output looks like (paste a real example from your own run)
+3. A common reason it might look different and what that signals
+
+Keep it to ≤10 lines of commands/output. This should feel like the last step in a checklist,
+not a new section.
+```
+
+---
+
+## Titles and Metadata
+
+Use these prompts to improve how your post is discovered, shared, and summarised.
+
+### Write a Better Post Title
+
+```
+The current title is accurate but doesn't signal value to a reader scanning a list of posts.
+
+CURRENT TITLE: [paste current title]
+
+WHAT THE POST ACTUALLY TEACHES: [1–2 sentences on the key insight or takeaway]
+TARGET READER: [who gets the most value from this]
+
+Generate 5 alternative titles, each using a different approach:
+1. Problem-first: "Why Our X Was Silently Failing — and What Fixed It"
+2. Result-first: "How We Cut X by 60%: A Step-by-Step Breakdown"
+3. Insight-first: "The Hidden Cost of X That Most Teams Overlook"
+4. Audience-specific: "A Practical Guide to X for Engineers Using Y"
+5. Counterintuitive: "We Stopped Using X. Our Performance Doubled."
+
+For each title, note who it's optimised for. Flag which you'd recommend and why.
+```
+
+### Write Post Descriptions for Different Channels
+
+```
+I need a short description of this post for multiple contexts.
+
+THE POST:
+[Paste the full post, or a detailed summary]
+
+Write three versions:
+
+1. INTERNAL BLOG LISTING (3 sentences)
+   For our internal blog — assume the reader knows our stack. Lead with the problem solved.
+
+2. SLACK SHARE MESSAGE (2 sentences + [link] placeholder)
+   Something a colleague would actually send in a channel. Should answer "why should I click this?"
+
+3. EXTERNAL ABSTRACT (4–6 sentences)
+   For a company engineering blog or dev.to. No internal jargon; no assumed familiarity.
+
+For all versions: lead with the specific problem or insight, not with "in this post we discuss...".
+```
+
+### Generate Tags and Categories for Discoverability
+
+```
+This post needs tags for internal search and discoverability. Based on the content, suggest:
+
+THE POST:
+[Paste the post or a detailed description]
+
+Suggest:
+1. Primary topic tag (the single most specific topic — e.g., "PostgreSQL", "Kubernetes", "FastAPI")
+2. 4–6 secondary tags (related technologies, patterns, or problem types)
+3. Audience tag ("backend", "platform", "frontend", "data", "all-teams")
+4. Template type tag ("case-study", "debugging-guide", "tool-deep-dive", "comparison", "performance")
+
+For each tag, note whether it's a term someone would actually search when facing a similar problem.
+```
+
+---
+
+## Consistency and Continuity
+
+Use these prompts when a draft has inconsistencies in terminology, voice, or narrative structure.
+These are best applied to a near-final draft after individual sections have been refined.
+
+### Audit Terminology Consistency
+
+```
+This post uses several technical terms inconsistently. I want to standardise on one term throughout.
+
+[Paste the full post]
+
+For each of the following term groups, find every occurrence and tell me which variant appears where:
+- [Term A variants: e.g., "endpoint", "route", "API route"]
+- [Term B variants: e.g., "worker", "consumer", "processor"]
+- [Term C variants: e.g., "service", "microservice", "application"]
+
+Then rewrite the post using the consistent version I specify:
+- [Term A] → [the version to standardise on]
+- [Term B] → [the version to standardise on]
+
+Don't change any other wording — only the terminology listed above.
+```
+
+### Check That the Narrative Arc Is Coherent
+
+```
+I'm worried this post doesn't hold together as a coherent story. Individual sections are good
+but the reader may not understand why one follows another.
+
+[Paste the full post]
+
+Read through and identify:
+1. Any section that introduces a concept without setting it up earlier
+2. Any section that resolves something the reader wasn't yet aware was a problem
+3. Any transition that feels abrupt — where the section jump requires the reader to fill in a gap
+4. The point where a reader who just wants to know "did this work?" would likely stop reading
+
+For each issue found, suggest a specific fix: a transition sentence, a brief set-up paragraph,
+or a reordering of sections.
+```
+
+### Ensure the Conclusion Delivers on the Introduction's Promise
+
+```
+I want to check that the conclusion resolves what the introduction set up.
+
+THE INTRODUCTION:
+[Paste the intro/opening section]
+
+THE CONCLUSION:
+[Paste the conclusion]
+
+Evaluate:
+1. Does the conclusion directly address the specific problem or question raised in the intro?
+2. Are there claims made in the intro that aren't addressed anywhere in the post?
+3. Does the tone of the conclusion match the intro — if the intro was urgent, does the
+   conclusion feel satisfying rather than trailing off?
+
+Then rewrite the conclusion to more clearly mirror and resolve the intro's setup, without
+restating the intro's words.
+```
+
+### Check for Consistent Tone Across Sections
+
+```
+This post has sections written at different times and they don't quite sound like the same author.
+
+[Paste the full post]
+
+Identify the 2–3 sections that feel most tonally different from the rest. For each:
+- Describe the difference (e.g., "this section is more formal", "this section is more casual",
+  "this section hedges where the rest is direct")
+- Rewrite that section to match the dominant tone of the post
+
+THE DOMINANT TONE I WANT: [e.g., direct and practical, conversational but precise, formal
+engineering documentation style]
+
+Don't change any technical content — only adjust the voice.
 ```
