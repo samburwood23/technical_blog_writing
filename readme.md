@@ -36,6 +36,8 @@
 
 - [Writing Best Practices](#writing-best-practices)
 
+- [Common Pitfalls](#common-pitfalls)
+
 - [AI-Assisted Writing](#ai-assisted-writing)
 
 - [Publishing Workflow](#publishing-workflow)
@@ -524,6 +526,34 @@ npm run analyze-bundle
 - **For other teams:** Explain team-specific context
 
 - **For new hires:** Include links to foundational knowledge
+
+---
+
+## ⚠️ Common Pitfalls
+
+Even well-written technical work can produce posts that don't land. The patterns below are the
+most common reasons a technically solid post fails to be useful.
+
+**Anti-patterns to watch for:**
+
+| Anti-pattern | The symptom | The fix |
+|---|---|---|
+| **The Documentation Dump** | Reads like a spec or release note — no story, no decisions | Add the "why" behind each decision and what you tried first |
+| **The Tutorial That Isn't** | Everything in it is on the official docs page | Focus on what *your team* learned that isn't obvious |
+| **The Missing Middle** | Goes from problem → solution with no investigation | Write the failed hypotheses and the investigation process |
+| **The Generic Conclusion** | Lessons apply to every engineering project ever | Trace each lesson back to a specific moment in the project |
+| **The Weak Opening** | Starts with "In this post I will explain..." | Start in the middle of the problem — hook first, background second |
+| **The Unmarked Opinion** | Team preferences stated as objective facts | Mark opinions explicitly and scope the conditions where they hold |
+| **The Incomplete Example** | Code calls undefined helpers or wouldn't run | Make examples self-contained, or clearly mark what they depend on |
+| **The Abstract Example** | Code uses `foo`, `bar`, `doSomething()` | Use realistic domain names from your actual system |
+| **The Hedge Spiral** | Every claim is qualified until no guidance remains | Be direct, then scope: "we use this for X; below Y it's not worth it" |
+| **The Buried Lede** | The most interesting finding is in section 5 | Surface the surprising thing early — in the TL;DR or opening |
+| **The Asymmetric Comparison** | Only the rejected option's weaknesses are shown | Apply the same lens to both; acknowledge the real strengths of what you didn't choose |
+| **Metrics Without Method** | "We improved performance by 60%" | Pair every number with: what was measured, how, and under what conditions |
+
+Full explanations, examples, and fixes for each: [`docs/common-pitfalls.md`](./docs/common-pitfalls.md)
+
+That doc also covers **how to spot topics worth writing about** from your daily work.
 
 ---
 
