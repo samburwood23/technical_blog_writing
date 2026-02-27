@@ -547,15 +547,52 @@ Include:
 Length: 1200-1500 words
 ```
 
+For more detailed first-draft prompts, see [`docs/ai-prompting/template-prompts.md`](./docs/ai-prompting/template-prompts.md).
+
 ### Refinement Prompts
 
+Use these on specific sections *after* you have a first draft. Full prompt templates for each
+are in [`docs/ai-prompting/refinement-and-editing.md`](./docs/ai-prompting/refinement-and-editing.md).
+
+**Structure**
 - "Add more context about why we chose this approach over alternatives"
+- "Restructure this dense paragraph for skimmability — turn it into a bulleted list or table"
+- "Add a 'Key Takeaways' callout box at the top summarising the 3 main points"
+- "These two sections feel disconnected — add a transition that logically links them"
+- "This section explains what we did but not why it matters — add a 'so what' paragraph"
 
-- "Include troubleshooting steps for the 3 most common issues"
-
+**Clarity and Technical Depth**
+- "Simplify this paragraph — split sentences, move the key point first, add a concrete example"
+- "This explanation is too abstract — add a concrete example using our tech stack"
 - "Expand the code examples with better error handling"
+- "Add a 'before' version of the code so readers can recognise the pattern in their own codebase"
+- "Add a 'what happens if you skip this' paragraph to motivate the reader to follow the guidance"
+- "Add a security considerations callout for this section"
 
+**Opening, Closing, and Flow**
+- "Rewrite the opening — start with the incident/alert/complaint, not the background"
+- "Strengthen the conclusion: one-sentence takeaway, a concrete next action, and an open question"
+- "Write three TL;DR versions: 2-sentence, 1-sentence, and tweet-length"
+
+**Audience and Tone**
 - "Add links to our internal documentation where relevant"
+- "Include troubleshooting steps for the 3 most common issues"
+- "Remove marketing language — replace superlatives with specific measurements"
+- "Adjust this section for a less experienced reader without dumbing it down"
+- "Adapt this section for external publication — replace internal names with generic descriptions"
+
+**Examples**
+- "Replace placeholder names with realistic names from our domain (Order, User, checkout-api, etc.)"
+- "Add a counterexample showing the wrong approach and why it fails"
+- "Split this example into a minimal version (≤15 lines) and a full production version"
+
+**Titles and Sharing**
+- "Write 5 alternative titles using different approaches: problem-first, result-first, counterintuitive..."
+- "Write a Slack share message and an internal blog listing description for this post"
+
+**Length**
+- "Cut this section by 30% without losing technical accuracy — show what you cut and why"
+- "This post is too long — identify the 2–3 sections that contribute least to the core message"
 
 ---
 

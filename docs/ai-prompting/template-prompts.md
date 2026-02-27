@@ -82,6 +82,34 @@ AFTER:
 Rewrite the implementation section using this exact code. Add inline comments explaining the key changes. Don't modify the code — only add comments.
 ```
 
+**If the business impact section is vague:**
+```
+The business/engineering impact in "The Challenge" section is too vague — "it caused problems"
+isn't enough to help a reader decide whether this post is relevant to them.
+
+Here are the actual consequences we experienced:
+[paste: SLA breaches, customer complaints, engineering hours lost, revenue impact, error rates, etc.]
+
+Rewrite the impact section using these specific details. If we have numbers, use them. If we
+only have qualitative data, describe the concrete events: the page at 2am, the support escalation,
+the sprint disruption — not just "it was bad".
+```
+
+**If the lessons learned section feels generic:**
+```
+The "Lessons Learned" section reads like general engineering advice rather than something
+specific to what we went through.
+
+Here's what we actually learned — including where our assumptions were wrong:
+- We initially thought [X] was the cause. We were wrong because [Y].
+- The fix that seemed obvious ([Z]) didn't work because [reason].
+- If we faced this again, we'd [specific change to our approach].
+- We'd add [specific alert / test / code pattern] to catch this earlier.
+
+Rewrite the lessons section using these specific details. Each lesson should be traceable
+back to something that actually happened in this incident.
+```
+
 ---
 
 ## 2. Tool / Technology Deep Dive
@@ -154,6 +182,21 @@ For each alternative, base the comparison on these notes:
 The comparison should reflect our team's context (stack, scale, team experience) — not a generic internet comparison.
 ```
 
+**If the "why we adopted this tool" section is missing or thin:**
+```
+The post jumps straight into how to use [tool] without explaining why we chose it over what we
+were doing before. Readers need this context to judge whether they should adopt it too.
+
+Here's our actual adoption story:
+- What we were doing before [tool]: [describe the previous solution or absence of one]
+- The specific pain point that triggered evaluation: [the incident, the scaling wall, the dev complaint]
+- Other tools we briefly considered and why we didn't choose them: [list + reason]
+- The moment we decided to proceed: [the POC result, the benchmark, the recommendation]
+
+Write a "Why We Adopted [Tool]" section (200–300 words) using these details. It should read
+like a decision record, not a product testimonial.
+```
+
 ---
 
 ## 3. Before / After Refactoring Story
@@ -217,6 +260,38 @@ Our actual steps were:
 3. [Third step]
 
 Rewrite the process section showing these intermediate steps. Each step should have: what we did → why we did it in this order → the code at this intermediate stage.
+```
+
+**If the lessons learned section is too brief or obvious:**
+```
+The lessons learned section is either too short or lists things any engineer would already know.
+The most useful lessons from a refactoring are the ones specific to what we found in *this* codebase.
+
+Here are the specific things we'd do differently or watch for in future code reviews:
+- [Specific pattern in the original code that we now know to catch early]
+- [Something we assumed would be easy that turned out to be hard, and why]
+- [A decision we made during the refactor that we're still uncertain about]
+- [A thing we wanted to refactor but deliberately left alone, and when we'd revisit it]
+
+Rewrite the lessons section with these specific points. Each lesson should finish with a
+practical implication: "so now we [specific practice / review habit / code pattern]".
+```
+
+**If the metrics table is missing or uses vague improvements:**
+```
+The results section claims the refactor was successful but the evidence is thin.
+
+Here are the actual measurements we took before and after:
+BEFORE:
+- [Metric: e.g., test run time, cyclomatic complexity, lines of code, error rate]
+- [Value + how measured]
+
+AFTER:
+- [Same metric]
+- [Value + how measured]
+
+Build a results table using these numbers. For any metric where we don't have exact numbers,
+flag it with [ESTIMATED] and note how we arrived at the estimate. Don't invent numbers.
 ```
 
 ---
@@ -295,6 +370,39 @@ Add a callout box after the results table that says:
 Use this phrasing pattern: "These results reflect [our specific conditions]. Your results will differ if [condition that changes the outcome]."
 ```
 
+**If the decision context doesn't give enough constraints:**
+```
+The "Decision Context" section describes what we needed but not the constraints that shaped
+our evaluation. Without these, readers from different teams may over-apply our findings.
+
+Our actual constraints were:
+- Scale: [e.g., requests per second, data volume, number of services]
+- Team: [e.g., team size, existing expertise, ramp-up time available]
+- Timeline: [e.g., had to ship in X weeks]
+- Budget/cost: [e.g., licence cost, operational cost considerations]
+- Existing dependencies: [e.g., already using X, so Y integrates better]
+
+Add a "Constraints That Shaped Our Evaluation" subsection listing these. Then add a "What
+Would Change Our Recommendation" paragraph: if [constraint] were different, we'd have chosen
+[the other option] instead. This is the part that makes the post useful to teams with different contexts.
+```
+
+**If the "what would change our decision" section is missing:**
+```
+This post documents what we chose but doesn't say when a different team should make a different choice.
+
+Our actual position is:
+- We'd choose [Tech B] instead if: [condition — e.g., team is smaller, data volume is lower,
+  latency requirements are looser, cost is the primary constraint]
+- We'd revisit our decision if: [future change — e.g., Tech B releases feature X, our scale
+  changes by Y, we hire someone with expertise in Z]
+- We explicitly didn't consider [factor] because [reason] — a team where that matters should weight it differently
+
+Write a "When You Should Choose Differently" section (150–200 words) making our position honest
+and useful to teams with different constraints. This is not a disclaimer — it's the most
+team-independent value in the whole post.
+```
+
 ---
 
 ## 5. Debugging / Troubleshooting Guide
@@ -366,6 +474,38 @@ During this incident, we wasted time investigating:
 - [Red herring 2]: [Why it seemed relevant, why it wasn't]
 
 Write this section explaining how to rule each one out quickly, with a specific check for each.
+```
+
+**If the prevention section is too generic:**
+```
+The "Prevention" section says things like "add monitoring" and "improve your config management"
+without any specifics. An engineer reading this section after an incident wants to know exactly
+what to add, not that they should add something.
+
+Here's what we actually added or changed after this incident:
+- [Specific alert: name, threshold, what it catches]
+- [Specific code pattern or guard that prevents recurrence]
+- [Specific config change or validation we added]
+- [Runbook or playbook link we created]
+
+Rewrite the Prevention section with these specific additions. For each item include:
+1. What to add (the exact alert query, code snippet, or config setting)
+2. Where it goes (which service, which config file, which monitoring dashboard)
+3. What it catches (the specific failure mode it would have detected earlier)
+```
+
+**If the escalation section is incomplete:**
+```
+The escalation section is missing the information an on-call engineer needs to decide
+*when* to escalate vs. keep investigating independently.
+
+Add:
+1. The specific signals that mean "stop investigating and escalate now":
+   [e.g., issue has persisted > 30 minutes, affecting > X% of traffic, data loss risk]
+2. The exact team or rotation to contact: [e.g., @team-sre via PagerDuty P1, not Slack]
+3. What information to have ready before escalating:
+   [e.g., error rate graph URL, pod logs from the last 30 minutes, last deployment time]
+4. What NOT to do while waiting: [e.g., don't restart pods without SRE sign-off if data is at risk]
 ```
 
 ---
@@ -445,4 +585,42 @@ Here's what we actually learned — including where we were wrong initially:
 - If we did this again, we would [specific change to the process].
 
 Rewrite the General Principles section using these specific learnings. Each principle should be grounded in something concrete from this project.
+```
+
+**If the profiling and investigation tools section is thin:**
+```
+The investigation section mentions that we "used a profiler" but doesn't explain the process
+well enough for another engineer to replicate it. The methodology is often more reusable than
+the specific fix.
+
+Here's what we actually did to investigate:
+1. [First tool and command: e.g., "ran py-spy top --pid $(pgrep -n gunicorn)"]
+2. [What it showed: paste actual output or describe key finding]
+3. [Second tool and command]
+4. [What it showed: and what made us look at the real bottleneck]
+5. [The moment we identified the actual bottleneck: what the data showed]
+
+ACTUAL PROFILER OUTPUT:
+[Paste your profiler output, flamegraph description, EXPLAIN ANALYZE result, or metrics screenshot description]
+
+Rewrite the investigation section using these exact steps and outputs. A reader should be able
+to follow this process on their own system. Include the actual commands, not pseudocode.
+```
+
+**If the effort vs. impact framing is missing:**
+```
+The optimisation strategy lists what we changed but not how we prioritised. Readers doing their
+own performance work need to know the effort/impact tradeoffs, not just the final list.
+
+For each optimisation we made:
+[Fill in this table from your notes]
+
+| Change | Engineering effort | Performance impact | How we knew it worked |
+|--------|-------------------|-------------------|----------------------|
+| [Change 1] | [hours / days] | [% improvement in which metric] | [measurement method] |
+| [Change 2] | ... | ... | ... |
+
+Rewrite the "Optimisation Strategy" section organising changes by this effort/impact framing.
+Group into: Quick Wins (< 1 day, measurable impact), Structural Changes (> 1 week, high impact),
+and Fine-Tuning (low effort, small gains). For each group, explain why we did them in this order.
 ```
