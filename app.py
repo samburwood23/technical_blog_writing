@@ -101,8 +101,12 @@ def chat(message: str, history: list) -> str:
 
     messages = [{"role": "system", "content": SYSTEM_TEMPLATE.format(context=context)}]
     for turn in history:
-        messages.append({"role": "user",      "content": turn[0]})
-        messages.append({"role": "assistant", "content": turn[1]})
+        # Gradio 5 passes history as dicts; Gradio 4 as tuples — handle both
+        if isinstance(turn, dict):
+            messages.append({"role": turn["role"], "content": turn["content"]})
+        else:
+            messages.append({"role": "user",      "content": turn[0]})
+            messages.append({"role": "assistant", "content": turn[1]})
     messages.append({"role": "user", "content": message})
 
     response = ""
