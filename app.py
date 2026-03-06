@@ -95,11 +95,11 @@ def retrieve(query: str, top_k: int = 3) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Mistral via HF Inference API
+# LLM via HF Inference API (router.huggingface.co)
 # ---------------------------------------------------------------------------
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-_client = InferenceClient("mistralai/Mistral-7B-Instruct-v0.3", token=HF_TOKEN)
+_client = InferenceClient("Qwen/Qwen2.5-72B-Instruct", token=HF_TOKEN)
 
 SYSTEM_TEMPLATE = """\
 You are a helpful assistant for technical blog writing. You help software engineers \
