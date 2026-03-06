@@ -43,25 +43,29 @@ def chunk_text(text, chunk_size=400, overlap=50):
     return chunks
 
 
-print("Loading documents...")
-_documents = load_documents()
-all_chunks = []
-for doc in _documents:
-    for chunk in chunk_text(doc["content"]):
-        all_chunks.append({"text": chunk, "source": doc["path"]})
-print(f"  {len(all_chunks)} chunks from {len(_documents)} files")
+_documents = None
+all_chunks = None
+_embedder = None
+_embeddings = None
 
 
-# ---------------------------------------------------------------------------
-# Embed chunks at startup
-# ---------------------------------------------------------------------------
-
-print("Embedding chunks (this may take a moment)...")
-_embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-_chunk_texts = [c["text"] for c in all_chunks]
-_embeddings = _embedder.encode(_chunk_texts, show_progress_bar=False)
-_embeddings = _embeddings / np.linalg.norm(_embeddings, axis=1, keepdims=True)
-print("  Done.")
+def _ensure_loaded():
+    global _documents, all_chunks, _embedder, _embeddings
+    if _embeddings is not None:
+        return
+    print("Loading documents...")
+    _documents = load_documents()
+    all_chunks = []
+    for doc in _documents:
+        for chunk in chunk_text(doc["content"]):
+            all_chunks.append({"text": chunk, "source": doc["path"]})
+    print(f"  {len(all_chunks)} chunks from {len(_documents)} files")
+    print("Loading embedder and encoding chunks...")
+    _embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    _chunk_texts = [c["text"] for c in all_chunks]
+    _embeddings = _embedder.encode(_chunk_texts, show_progress_bar=False)
+    _embeddings = _embeddings / np.linalg.norm(_embeddings, axis=1, keepdims=True)
+    print("  Done.")
 
 
 # ---------------------------------------------------------------------------
@@ -69,6 +73,7 @@ print("  Done.")
 # ---------------------------------------------------------------------------
 
 def retrieve(query: str, top_k: int = 3) -> list[dict]:
+    _ensure_loaded()
     q = _embedder.encode([query])
     q = q / np.linalg.norm(q)
     scores = (_embeddings @ q.T).squeeze()
