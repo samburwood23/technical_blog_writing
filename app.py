@@ -129,6 +129,8 @@ def chat(message: str, history: list) -> str:
 
     response = ""
     for token in _client.chat_completion(messages, max_tokens=600, stream=True):
+        if not token.choices:
+            continue
         delta = token.choices[0].delta.content
         if delta:
             response += delta
