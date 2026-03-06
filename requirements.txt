@@ -1,4 +1,4 @@
 sentence-transformers>=2.2.0
-huggingface-hub>=0.20.0,<0.25.0
+huggingface-hub>=0.27.0
 numpy>=1.24.0
 audioop-lts>=0.2.1
