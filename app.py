@@ -2,6 +2,19 @@ import os
 import glob as glob_module
 
 import numpy as np
+
+# huggingface_hub >= 0.25 removed HfFolder; shim it back so Gradio 4.x can import.
+import huggingface_hub as _hf
+if not hasattr(_hf, "HfFolder"):
+    class _HfFolder:
+        @staticmethod
+        def get_token(): return None
+        @staticmethod
+        def save_token(token): pass
+        @staticmethod
+        def delete_token(): pass
+    _hf.HfFolder = _HfFolder
+
 import gradio as gr
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
