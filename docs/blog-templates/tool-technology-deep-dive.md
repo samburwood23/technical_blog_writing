@@ -8,51 +8,57 @@
 
 ---
 
-# Complete Guide to [Tool Name] for [Specific Use Case]
+# Complete Guide to Hugging Face for AI-Powered Applications
 
 **Author:** [Your Name]
 **Date:** [Publication Date]
-**Tags:** [e.g., tooling, infrastructure, testing, frontend]
-**Version covered:** [Tool vX.Y — state the version so the post stays useful over time]
+**Tags:** huggingface, machine-learning, nlp, deployment, gradio
+**Version covered:** huggingface-hub 0.27+, Gradio 5.x, Spaces (March 2026)
 
 ---
 
 ## TL;DR
 
-> One paragraph: what the tool is, the single most important thing it does well, and who should read this post.
->
-> _Example: Testcontainers is a library that spins up real Docker containers during your test suite — databases, message brokers, anything — so your integration tests hit the real thing, not a mock. If you're maintaining hand-rolled mock infrastructure for tests, this post will show you a better path._
+Hugging Face is the platform where most of the open-source ML world lives — model weights, datasets, inference APIs, and free app hosting. The single most important thing it does well is collapsing the gap between "I found a model on the internet" and "I have a working API call returning results." If you want to add language model capabilities to a Python project without running your own GPU infrastructure, this post covers everything you need.
 
 ---
 
-## Why [Tool Name] Matters
+## Why Hugging Face Matters
 
 ### The Problem It Solves
 
-[Describe the pain that existed before this tool. Be specific — generic "it makes things easier" isn't useful.]
+Running language models used to require either a cloud GPU (expensive, complex) or a research institution's cluster (unavailable to most). Hugging Face changed that:
 
-- [Concrete pain point 1, e.g.: "We were maintaining three separate SQLite shims to fake Postgres behaviour in tests, and they diverged every time we upgraded Postgres."]
-- [Concrete pain point 2]
-- [Concrete pain point 3]
+- **Model discovery was fragmented.** Weights were scattered across Google Drive links, academic lab servers, and GitHub releases with no standard format.
+- **Inference required deep ML knowledge.** Loading a model meant understanding CUDA, tokenizers, precision settings, and batching — before writing a single line of application code.
+- **Deployment was a separate project.** Even if you got a model running locally, serving it to real users meant building and operating a web server, managing dependencies, and provisioning infrastructure.
+
+Hugging Face addresses all three: a central model registry with a standard API, a hosted inference service you can call over HTTP, and Spaces for deploying apps with no server management.
 
 ### Who Should Use It
 
 **Good fit if you:**
-- [Condition 1, e.g.: already use Docker in your dev environment]
-- [Condition 2]
-- [Condition 3]
+- Want to prototype an AI feature quickly without provisioning GPU infrastructure
+- Need access to open-source models (Qwen, Llama, Mistral, etc.) as a drop-in alternative to closed APIs
+- Are building a Gradio or Streamlit demo and want free public hosting
+- Want to store and version model artefacts or datasets alongside your code
 
 **Not a good fit if you:**
-- [Counter-condition 1, e.g.: your CI runners don't have Docker available]
-- [Counter-condition 2]
+- Need guaranteed latency SLAs — the free inference tier is shared and can be slow under load
+- Are running high-volume production inference (use a dedicated inference endpoint or self-hosted solution instead)
+- Require on-premise deployment with no external network calls
 
 ### How It Fits Our Stack
 
-[Explain where this tool sits in our existing architecture/workflow. A one-line diagram helps.]
+```
+[Your Python app]
+    └── huggingface_hub (SDK)
+          ├── InferenceClient  →  [HF Inference API]  →  [Hosted model]
+          ├── hf_hub_download  →  [Model Hub]         →  [Local weights]
+          └── SpaceStage       →  [Spaces hosting]    →  [Public URL]
+```
 
-```
-[Our CI pipeline] → [Tool] → [Test results / Build artefact / Deployed service]
-```
+For the writing assistant project: our `app.py` calls `InferenceClient` for chat completions, uses `SentenceTransformer` (backed by Hub model weights) for local embeddings, and the whole app runs on Spaces.
 
 ---
 
@@ -60,77 +66,108 @@
 
 ### Prerequisites
 
-- [Requirement 1, e.g.: Docker Desktop ≥ 4.x]
-- [Requirement 2, e.g.: Python ≥ 3.11]
-- [Requirement 3]
+- Python ≥ 3.10
+- A Hugging Face account (free) — needed for a token and to create Spaces
+- `pip` or `uv`
 
 ### Installation
 
 ```bash
-# Package manager install
-pip install testcontainers[postgres]
-
-# Or via our internal package index
-pip install testcontainers[postgres] --index-url https://pypi.internal.example.com/simple/
+pip install huggingface-hub>=0.27.0 gradio>=5.0.0 sentence-transformers
 ```
 
 ### Minimal Working Example
 
-[Show the absolute simplest thing that works — 10-20 lines. Readers should be able to copy-paste this and see a result immediately.]
+Call a hosted chat model in five lines:
 
 ```python
-from testcontainers.postgres import PostgresContainer
+from huggingface_hub import InferenceClient
 
-def test_database_connection():
-    with PostgresContainer("postgres:15") as pg:
-        connection_url = pg.get_connection_url()
-        # Your test code here — the container is live and ready
-        assert connection_url.startswith("postgresql+psycopg2://")
+client = InferenceClient("Qwen/Qwen2.5-72B-Instruct", token="hf_...")
+
+response = client.chat_completion(
+    messages=[{"role": "user", "content": "What makes a good opening paragraph?"}],
+    max_tokens=300,
+)
+print(response.choices[0].message.content)
 ```
 
 ---
 
 ## Core Concepts
 
-### Concept 1: [Name — e.g., Container Lifecycle]
+### Concept 1: The Model Hub
 
-[Explain the concept in plain language, then show code.]
+The Hub is a Git-backed registry of models, datasets, and Spaces. Every model has a card (a `README.md` with metadata), versioned weights, and a unique ID in the format `owner/model-name`.
 
-[Tool name] manages [concept] by [brief explanation]. The key thing to understand is [key insight].
+The key thing to understand is that model IDs are stable references — you pin to an ID and get the same weights every time, unless the author explicitly pushes a new version.
 
 ```python
-# Annotated example demonstrating the concept
-with PostgresContainer("postgres:15") as pg:
-    # Container starts here — Docker pulls image if not cached
-    url = pg.get_connection_url()
-    run_migrations(url)           # your setup
+from huggingface_hub import hf_hub_download
 
-    yield url                     # test runs
-
-# Container is stopped and removed here — no manual cleanup
+# Download a specific file from a model repo
+path = hf_hub_download(
+    repo_id="sentence-transformers/all-MiniLM-L6-v2",
+    filename="pytorch_model.bin",
+)
+# Returns a local path; subsequent calls hit the cache (~/.cache/huggingface/)
 ```
 
-> **Gotcha:** [Common misunderstanding or trap related to this concept]
+> **Gotcha:** The cache lives at `~/.cache/huggingface/hub` by default. In containerised environments (including Spaces), set `HF_HOME` to a writable path so downloads persist between builds.
 
-### Concept 2: [Name — e.g., Configuration]
+### Concept 2: The Inference API
+
+`InferenceClient` wraps Hugging Face's hosted inference service. You send a request, a model runs on their hardware, you get a response. No GPU required on your side.
 
 ```python
-# Show configuration options with inline comments
-pg = PostgresContainer("postgres:15") \
-    .with_env("POSTGRES_DB", "testdb") \
-    .with_env("POSTGRES_USER", "testuser") \
-    .with_bind_ports(5432, 5433)   # expose on a fixed local port
+from huggingface_hub import InferenceClient
+
+client = InferenceClient(
+    model="Qwen/Qwen2.5-72B-Instruct",
+    token="hf_...",          # set via HF_TOKEN env var in production
+    timeout=30,              # seconds before raising InferenceTimeoutError
+)
+
+# Streaming — yields chunks as they arrive
+for chunk in client.chat_completion(
+    messages=[{"role": "user", "content": "Explain RAG in one paragraph."}],
+    max_tokens=400,
+    stream=True,
+):
+    if chunk.choices:               # final chunk has an empty choices list
+        delta = chunk.choices[0].delta.content
+        if delta:
+            print(delta, end="", flush=True)
 ```
 
-### Concept 3: [Name — e.g., Waiting for Readiness]
+> **Gotcha:** Not every model on the Hub supports `chat_completion`. Models must expose an OpenAI-compatible chat endpoint. Stick to models explicitly tagged `conversational` or listed under the [Chat Models leaderboard](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard). If you get `400 model_not_supported`, swap the model ID.
 
-[Some concepts need more prose — write as much as the topic needs.]
+### Concept 3: Spaces (Hosted App Deployment)
+
+A Space is a Git repo that Hugging Face builds and runs for you. You push `app.py` and `requirements.txt`, add a YAML block to `README.md`, and get a public URL within a few minutes.
+
+```yaml
+# README.md — the YAML front matter tells Spaces how to run your app
+---
+title: Writing Assistant
+sdk: gradio
+sdk_version: 5.0.0
+app_file: app.py
+pinned: false
+---
+```
+
+```bash
+# Deploy by pushing to the Space repo (create it first on hf.co/new-space)
+git remote add space https://huggingface.co/spaces/your-username/writing-assistant
+git push space main
+```
+
+Secrets (like `HF_TOKEN`) are set via the Space's Settings → Variables and secrets UI, not committed to the repo. Access them as normal environment variables in your code:
 
 ```python
-# Example with wait strategy
-from testcontainers.core.waiting_utils import wait_for_logs
-
-container.with_wait_for(wait_for_logs("database system is ready"))
+import os
+token = os.environ.get("HF_TOKEN")
 ```
 
 ---
@@ -139,48 +176,79 @@ container.with_wait_for(wait_for_logs("database system is ready"))
 
 ### The Scenario
 
-[Describe a realistic project or task in our codebase that uses this tool. More concrete than a toy example.]
-
-We used [tool name] to [specific task, e.g.: replace our pytest-postgres fixture with a container-backed one across the payments service]. Here's the full setup:
+We built a RAG-powered writing assistant on Spaces that answers questions about a folder of internal markdown notes. The app embeds documents locally using `all-MiniLM-L6-v2`, retrieves the closest chunks to each user question, and passes them as context to `Qwen2.5-72B-Instruct` via the Inference API.
 
 ### Full Working Example
 
 ```python
-# conftest.py — shared fixture for the payments service test suite
-import pytest
-from sqlalchemy import create_engine
-from testcontainers.postgres import PostgresContainer
+# app.py
+import os
 
-@pytest.fixture(scope="session")
-def postgres_container():
-    """
-    Starts a real Postgres container once per test session.
-    Costs ~3s on first run (image pull), then reuses the running container.
-    """
-    with PostgresContainer("postgres:15-alpine") as pg:
-        engine = create_engine(pg.get_connection_url())
-        # Run Alembic migrations against the fresh container
-        run_alembic_migrations(engine)
-        yield engine
+# --- Compatibility shim (must come before `import gradio`) ---
+# Gradio 4.44 imports HfFolder, which was removed in huggingface-hub 0.25.
+import huggingface_hub as _hf
+if not hasattr(_hf, "HfFolder"):
+    class _HfFolder:
+        @staticmethod
+        def get_token(): return None
+        @staticmethod
+        def save_token(token): pass
+        @staticmethod
+        def delete_token(): pass
+    _hf.HfFolder = _HfFolder
 
-@pytest.fixture(autouse=True)
-def rollback_after_test(postgres_container):
-    """Wraps each test in a transaction that gets rolled back."""
-    connection = postgres_container.connect()
-    transaction = connection.begin()
-    yield connection
-    transaction.rollback()
-    connection.close()
+import gradio as gr
+from huggingface_hub import InferenceClient
+
+client = InferenceClient(
+    "Qwen/Qwen2.5-72B-Instruct",
+    token=os.environ.get("HF_TOKEN"),
+)
+
+# Lazy-load the embedder to avoid OOM kill on Spaces free tier
+_embedder = None
+
+def _get_embedder():
+    global _embedder
+    if _embedder is None:
+        from sentence_transformers import SentenceTransformer
+        _embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    return _embedder
+
+def retrieve(query: str, top_k: int = 3) -> str:
+    """Return the top_k most relevant document chunks for the query."""
+    embedder = _get_embedder()
+    # ... (your vector search logic here)
+    return "<retrieved context>"
+
+def chat(message: str, history: list) -> str:
+    context = retrieve(message)
+    messages = [
+        {"role": "system", "content": f"Answer using this context:\n{context}"},
+        {"role": "user",   "content": message},
+    ]
+    response = ""
+    for chunk in client.chat_completion(messages, max_tokens=600, stream=True):
+        if not chunk.choices:
+            continue
+        delta = chunk.choices[0].delta.content
+        if delta:
+            response += delta
+            yield response
+
+gr.ChatInterface(fn=chat).launch()
 ```
 
 ### Common Pitfalls and Solutions
 
 | Pitfall | Why It Happens | Fix |
 |---------|---------------|-----|
-| `DockerException: Error while fetching server API version` | Docker not running | Start Docker Desktop; check `docker info` |
-| Container takes 60+ seconds to start | Image not cached locally | Pre-pull in CI: `docker pull postgres:15-alpine` |
-| Port conflict on `5432` | Local Postgres running | Use `.with_bind_ports(5432, 0)` to assign a random port |
-| Tests pass locally, fail in CI | CI runner lacks Docker | Use a Docker-in-Docker CI executor |
+| `ModuleNotFoundError: No module named 'audioop'` | Python 3.13 removed `audioop`; Gradio depends on it transitively | Add `audioop-lts` to `requirements.txt` |
+| `ImportError: cannot import name 'HfFolder'` | `huggingface-hub >= 0.25` removed `HfFolder`; older Gradio still imports it | Add the `HfFolder` shim before `import gradio` (see example above) |
+| Space restarts silently (exit code 137) | OOM — model loaded at import time exceeds free-tier RAM | Use lazy loading: only load the model on first request |
+| `410 Gone` from the Inference API | Old API endpoint was deprecated in late 2025 | Pin `huggingface-hub>=0.27.0` in `requirements.txt` |
+| `IndexError: list index out of range` during streaming | Final streaming chunk has empty `choices` list | Guard with `if not chunk.choices: continue` |
+| `400 model_not_supported` | Model doesn't support the chat completion API | Switch to a model tagged `conversational`, e.g. `Qwen/Qwen2.5-72B-Instruct` |
 
 ---
 
@@ -188,44 +256,47 @@ def rollback_after_test(postgres_container):
 
 ### Performance
 
-- **Session-scope expensive containers** — starting a Postgres container takes 2-5 seconds. Use `scope="session"` in pytest fixtures and wrap tests in transactions that roll back rather than recreating the container per test.
-- **Use Alpine images** — `postgres:15-alpine` is ~80MB vs ~370MB for the full image. Faster pulls in CI.
-- **Pre-pull in CI** — add a `docker pull` step before your test step to separate network time from test time.
+- **Lazy-load all models.** The Spaces free tier has a 16GB RAM ceiling shared with the build environment. Loading weights at import time can push the process over the limit and cause a silent OOM restart (exit code 137). Always load behind a function call that fires on the first real request.
+- **Use `all-MiniLM-L6-v2` for local embeddings.** At ~90MB it's the smallest model that still produces high-quality semantic embeddings. Larger alternatives (e.g. `bge-large-en`) are 5–10× bigger for marginal gains on most retrieval tasks.
+- **Stream responses.** `stream=True` on `chat_completion` lets you `yield` partial results to Gradio's `ChatInterface`, making the UI feel responsive even on long completions.
 
 ### Security
 
-- [Security consideration relevant to the tool, e.g.: Never expose container ports on `0.0.0.0` in shared CI environments]
-- [e.g.: Use short-lived credentials generated per container rather than hardcoded test passwords]
+- **Never commit tokens to the repo.** Set `HF_TOKEN` as a Space secret (Settings → Variables and secrets). Tokens committed to a public Space repo are immediately visible and will be rotated by Hugging Face's secret scanning.
+- **Use read-only tokens for inference.** Create a token with `Read` scope only — it can call the Inference API but cannot push models or modify your account.
 
 ### Production Readiness
 
-- [Note about what this tool is/isn't appropriate for in production]
-- [Any monitoring or observability considerations]
+- **Spaces free tier is for prototypes.** For production traffic, use a dedicated Inference Endpoint (HF's managed GPU service) or self-host with `text-generation-inference`. The free tier is rate-limited and shared.
+- **Pin `sdk_version` in your README.** The platform default changes over time. Pinning ensures your app behaves consistently after a Spaces infrastructure update.
 
 ---
 
-## When to Use [Tool Name] vs. Alternatives
+## When to Use Hugging Face vs. Alternatives
 
-| Scenario | [Tool Name] | [Alternative A] | [Alternative B] |
-|----------|------------|-----------------|-----------------|
-| Integration tests against real DB | ✅ Best choice | ⚠️ Requires setup | ❌ Mocks behaviour |
-| Unit tests with no I/O | ❌ Overkill | ❌ Overkill | ✅ Best choice |
-| [Scenario 3] | [Assessment] | [Assessment] | [Assessment] |
+| Scenario | Hugging Face | OpenAI API | Self-hosted (vLLM / Ollama) |
+|----------|-------------|------------|----------------------------|
+| Prototype / demo on free hosting | ✅ Spaces is purpose-built for this | ⚠️ No free hosting | ❌ Requires infra |
+| Access to open-source models | ✅ Thousands of models | ❌ Closed models only | ✅ Full control |
+| Production inference at scale | ⚠️ Use Dedicated Endpoints | ✅ Reliable, SLA-backed | ✅ Best cost/perf at volume |
+| Local / offline use | ✅ Download weights via Hub | ❌ Requires internet | ✅ Fully offline |
+| Fastest time to first token | ⚠️ Shared tier is variable | ✅ Consistently fast | ⚠️ Depends on your hardware |
 
-**Our recommendation:** [When does our team reach for this tool vs. the alternatives?]
+**Our recommendation:** Use Hugging Face Spaces + Inference API for prototyping and internal tools. Move to Dedicated Endpoints or self-hosted inference when you have real traffic or latency requirements.
 
 ---
 
 ## Further Reading
 
-- [Official documentation](link)
-- [Link to internal ADR (Architecture Decision Record) if one exists]
-- [Related internal blog posts]
-- [Useful community resources]
+- [Hugging Face Hub documentation](https://huggingface.co/docs/hub)
+- [InferenceClient API reference](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/inference_client)
+- [Spaces configuration reference](https://huggingface.co/docs/hub/spaces-config-reference)
+- [Gradio documentation](https://www.gradio.app/docs)
+- [text-generation-inference (self-hosted)](https://huggingface.co/docs/text-generation-inference)
 
 ---
 
-*Questions? Leave a comment or ask in [#relevant-slack-channel].*
+*Questions? Leave a comment or ask in [#ml-platform].*
 
 ---
 
@@ -234,5 +305,5 @@ def rollback_after_test(postgres_container):
 - [ ] Version number stated in the header
 - [ ] All code examples are tested against the stated version
 - [ ] "Not a good fit" section is honest and complete
-- [ ] Pitfalls section covers the top 3 issues we actually encountered
+- [ ] Pitfalls section covers the top issues actually encountered
 - [ ] Technical review completed by [@reviewer]
