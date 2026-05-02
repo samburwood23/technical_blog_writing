@@ -129,14 +129,14 @@ demo = gr.ChatInterface(
         "openings, code examples, common pitfalls, AI prompting strategies, and more."
     ),
     examples=[
-        "What blog template should I use for a debugging story?",
-        "What are the most common pitfalls when writing technical posts?",
-        "How do I write a strong opening for a performance case study?",
-        "Give me a prompt to get AI help drafting a before/after refactoring post.",
-        "How should I structure the metrics section of a post?",
+        ["What blog template should I use for a debugging story?"],
+        ["What are the most common pitfalls when writing technical posts?"],
+        ["How do I write a strong opening for a performance case study?"],
+        ["Give me a prompt to get AI help drafting a before/after refactoring post."],
+        ["How should I structure the metrics section of a post?"],
     ],
     cache_examples=False,
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share=True)
