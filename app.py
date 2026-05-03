@@ -81,7 +81,11 @@ def retrieve(query: str, top_k: int = 3) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-_client = InferenceClient("mistralai/Mistral-7B-Instruct-v0.2", token=HF_TOKEN)
+_client = InferenceClient(
+    model="Qwen/Qwen2.5-7B-Instruct-1M",
+    provider="hf-inference",
+    token=HF_TOKEN,
+)
 
 SYSTEM_TEMPLATE = """\
 You are a helpful assistant for technical blog writing. You help software engineers \
