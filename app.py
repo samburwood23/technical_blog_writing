@@ -82,7 +82,7 @@ def retrieve(query: str, top_k: int = 3) -> list[dict]:
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
 _client = OpenAI(
-    base_url="https://router.huggingface.co/hf-inference/v1",
+    base_url="https://router.huggingface.co/nebius/v1",
     api_key=HF_TOKEN,
 )
 
@@ -114,7 +114,7 @@ def chat(message: str, history: list) -> str:
 
     response = ""
     for token in _client.chat.completions.create(
-        model="Qwen/Qwen2.5-7B-Instruct-1M", messages=messages, max_tokens=600, stream=True
+        model="Qwen/Qwen2.5-7B-Instruct", messages=messages, max_tokens=600, stream=True
     ):
         delta = token.choices[0].delta.content
         if delta:
