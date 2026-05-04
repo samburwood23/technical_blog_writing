@@ -4,7 +4,7 @@ import glob as glob_module
 import numpy as np
 import gradio as gr
 from sentence_transformers import SentenceTransformer
-from huggingface_hub import InferenceClient
+from openai import OpenAI
 
 
 # ---------------------------------------------------------------------------
@@ -81,10 +81,9 @@ def retrieve(query: str, top_k: int = 3) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
-_client = InferenceClient(
-    model="Qwen/Qwen2.5-7B-Instruct-1M",
-    provider="hf-inference",
-    token=HF_TOKEN,
+_client = OpenAI(
+    base_url="https://router.huggingface.co/hf-inference/v1",
+    api_key=HF_TOKEN,
 )
 
 SYSTEM_TEMPLATE = """\
@@ -114,7 +113,9 @@ def chat(message: str, history: list) -> str:
     messages.append({"role": "user", "content": message})
 
     response = ""
-    for token in _client.chat_completion(messages, max_tokens=600, stream=True):
+    for token in _client.chat.completions.create(
+        model="Qwen/Qwen2.5-7B-Instruct-1M", messages=messages, max_tokens=600, stream=True
+    ):
         delta = token.choices[0].delta.content
         if delta:
             response += delta
