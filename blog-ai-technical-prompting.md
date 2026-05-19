@@ -6,7 +6,7 @@
 
 ## The Problem With Most AI-Assisted Technical Writing
 
-The typical engineer's experience with AI-assisted writing goes like this: open a chat window, type "write a blog post about the database bug I fixed", and get back something that sounds vaguely authoritative but is subtly wrong about how PostgreSQL connection pooling actually behaves. You fix the obvious errors, but the result still feels generic. It could have been written by anyone, about any system, at any company.
+The typical engineer's experience with AI-assisted writing goes like this: open a chat window, type "write a blog post about the database bug I fixed", and get back something that sounds vaguely authoritative but is subtly wrong about how Cloud SQL connection pooling actually behaves. You fix the obvious errors, but the result still feels generic. It could have been written by anyone, about any system, at any company.
 
 The tool isn't the problem. The prompting is.
 
@@ -60,9 +60,9 @@ The more context you provide, the less generic the output.
 
 | Less useful | More useful |
 |-------------|-------------|
-| "Write a blog about fixing a bug" | "Write a blog about the connection pool exhaustion bug we fixed in checkout-api. Background: [paste notes]" |
-| "Explain how we use Docker" | "Explain our Docker setup for a new hire who knows Python but has never used containers" |
-| "Write about our refactoring" | "Write about how we removed 400 lines of duplicated ORM code from the billing service, triggered by a production incident where a schema change broke three independent copies of the same query" |
+| "Write a blog about fixing a bug" | "Write a blog about the Cloud SQL connection pool exhaustion bug we fixed in checkout-api running on Cloud Run. Background: [paste notes]" |
+| "Explain how we use Cloud Run" | "Explain our Cloud Run setup for a new hire who knows Python but has never deployed a containerised service on GCP" |
+| "Write about our refactoring" | "Write about how we removed 400 lines of duplicated ORM code from the billing service, triggered by a production incident where a Cloud SQL schema migration broke three independent copies of the same query" |
 
 The difference isn't length — it's specificity. A good prompt gives the AI enough to make decisions without you.
 
@@ -70,12 +70,12 @@ The difference isn't length — it's specificity. A good prompt gives the AI eno
 
 Who you're writing for changes everything: vocabulary, assumed knowledge, the level of explanation needed for each concept.
 
-- **"Our team"** — assumes familiarity with your stack; no need to explain why you're using FastAPI or what ECS is
+- **"Our team"** — assumes familiarity with your stack; no need to explain why you're using FastAPI or what Cloud Run is
 - **"Other internal teams"** — needs your stack explained; knows general software engineering concepts
 - **"New hires (0–12 months experience)"** — needs foundational concepts linked or briefly explained
 - **"External / public"** — no internal jargon; everything must be self-contained; scrub internal system names and hostnames
 
-Setting the audience explicitly in your prompt prevents the AI from producing something that simultaneously over-explains async Python to your senior engineers while under-explaining why a particular AWS configuration matters.
+Setting the audience explicitly in your prompt prevents the AI from producing something that simultaneously over-explains async Python to your senior engineers while under-explaining why a particular GCP IAM configuration matters.
 
 ### 3. Paste Your Raw Notes
 
@@ -102,7 +102,7 @@ This approach — working section by section rather than regenerating the whole 
 
 ### 5. Always Verify Technical Content
 
-AI can confidently produce plausible-sounding but subtly wrong technical explanations. It may describe a PostgreSQL locking mechanism in terms that are mostly right but miss a detail that matters for your specific version. It may suggest a Kubernetes configuration that works in principle but not with your networking setup.
+AI can confidently produce plausible-sounding but subtly wrong technical explanations. It may describe a Cloud Spanner locking mechanism in terms that are mostly right but miss a detail that matters for your specific schema design. It may suggest a GKE configuration that works in principle but not with your VPC-native networking setup.
 
 Treat AI output as a first draft from a smart generalist, not a source of truth. Your technical review step is non-negotiable, and the peer reviewer should be someone who can catch the subtle errors, not just the obvious ones.
 
@@ -119,7 +119,7 @@ CONTEXT:
 - Topic: [what you solved or built]
 - Template type: [Problem-Solution / Tool Deep Dive / Refactoring / Comparison / Debugging / Performance]
 - Target audience: [our team / other teams / new hires]
-- Our stack: [list your main technologies]
+- Our stack: Python, FastAPI, Cloud SQL (PostgreSQL), GCP (Cloud Run + GKE), Pub/Sub
 - Approximate length: 1,200 words
 
 MY NOTES:
@@ -199,7 +199,7 @@ For each optimisation, include:
 - **Impact:** percentage improvement in which specific metric
 - **Method:** how the impact was measured
 
-"We made it faster" is not a useful lesson. "Adding an index on `(user_id, created_at)` reduced P99 latency from 480ms to 22ms on the user activity feed endpoint, measured with k6 against production data volume" is a lesson someone can apply.
+"We made it faster" is not a useful lesson. "Adding a composite index on `(user_id, created_at)` in Cloud SQL reduced P99 latency from 480ms to 22ms on the user activity feed endpoint, measured with k6 against production data volume on a db-n1-standard-4 instance" is a lesson someone can apply.
 
 ---
 
@@ -230,8 +230,9 @@ picture what's actually happening.
 
 [paste section]
 
-Add a concrete example that uses our actual tech stack. Take no more than 3–5 lines of
-code or 2–3 sentences of prose. Don't replace the abstract explanation — add the example after it.
+Add a concrete example that uses our actual tech stack (Python, FastAPI, Cloud SQL, GKE).
+Take no more than 3–5 lines of code or 2–3 sentences of prose. Don't replace the abstract
+explanation — add the example after it.
 ```
 
 ### When the lessons section is generic
@@ -278,7 +279,7 @@ Good at restructuring and shortening verbose drafts. Use the custom instructions
 
 ### Gemini
 
-Strong at summarising long documents, which makes it useful for turning incident retrospectives or long PRs into a blog post foundation. Ask it to "cite specific sections of my notes" in the output to reduce the risk of it drifting from your actual content.
+Strong at summarising long documents, which makes it useful for turning incident retrospectives or long PRs into a blog post foundation. If your team is on Google Workspace, you can feed it directly from Google Docs or Sheets — useful for turning a post-mortem doc into a draft without copy-pasting. Ask it to "cite specific sections of my notes" in the output to reduce the risk of it drifting from your actual content.
 
 ---
 
@@ -290,7 +291,7 @@ Strong at summarising long documents, which makes it useful for turning incident
 
 **For the post-hoc rationalisation check:** AI will write a confident, well-structured rationale for whatever decision you made. It won't tell you whether the decision was actually correct or whether you evaluated the alternatives fairly. That's what peer review is for.
 
-**For security-sensitive content:** Don't paste internal credentials, hostnames, architecture diagrams, or customer data into AI tools. The convenience isn't worth the risk.
+**For security-sensitive content:** Don't paste internal credentials, GCP service account keys, VPC architecture diagrams, Cloud SQL connection strings, or customer data into AI tools. The convenience isn't worth the risk.
 
 ---
 
