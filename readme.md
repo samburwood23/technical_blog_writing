@@ -706,6 +706,10 @@ are in [`docs/ai-prompting/refinement-and-editing.md`](./docs/ai-prompting/refin
 
 - [Database Query Optimization Results](link) by @dev-name
 
+#### Engineering Practices
+
+- [Convert Expensive Generation into Cheap Verification](docs/blog-examples/convert-generation-into-verification.md) by Sam Burwood
+
 ---
 
 ## 🆘 Getting Help
