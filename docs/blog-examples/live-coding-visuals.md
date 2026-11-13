@@ -62,7 +62,7 @@ shape(H("<3 4 5 6>"), 0.35, 0.02)    // a new shape on every chord
 
 ### Composing them
 
-Because `H()` gives you a function, you can combine several with plain JavaScript. In pattern 71 the kick pulse should only appear in sections that have a kick:
+Because `H()` gives you a function, you can combine several with plain JavaScript. Pattern 71 is one of the kit's seven New Monkey tunes: the bouncy, makina-style hard dance sound with offbeat octave basslines and piano riffs, at around 170 BPM. In it, the kick pulse should only appear in sections that have a kick:
 
 ```js
 const kickIn = H("<1@8 1@8 1@16 1@8 0@8 1@4 1@16>")  // 1 = this section has a kick
@@ -76,7 +76,7 @@ When `kickIn()` is 0 the pulse is multiplied out to a steady 1.
 
 ### Scene changes on the bar
 
-The full tracks (67–73) change scene when the music changes section. Each Hydra setting holds one value per section, using `@` weights so a value lasts that many cycles:
+The seven full New Monkey tracks (67–73) change scene when the music changes section: intro, bounce, riff, breakdown, build, drop. Each Hydra setting holds one value per section, using `@` weights so a value lasts that many cycles:
 
 ```js
 // intro 8, skip bounce 8, bell riff 16, offbeat pianos 8, breakdown 8, kick roll 4, drop 16
@@ -239,7 +239,7 @@ You can mix the two: use `bpm` for the structure (shapes, colours) and the mic f
 >
 > I wrote up how it works, the CSS stacking bug that put the visuals on top of my code, a name collision between Strudel's shape() and Hydra's, the gotcha that throws on every frame, and how to sync Hydra when Strudel isn't making the music.
 >
-> 🎥 Clip: New Monkey V, with the stars' size, number and spin all driven by the music's patterns.
+> 🎥 Clip: one of my New Monkey tunes, written in code, with the stars' size, number and spin all driven by the music's patterns.
 >
 > [link to article]
 >
