@@ -1,8 +1,7 @@
 # Building a Tiny Skateboard-Themed Linux OS (and the Three Bugs That Taught Me How Booting Works)
 
 **Author:** Sam Burwood
-**Tags:** linux, operating-systems, busybox, virtualbox, shell, ai-assisted-coding
-**Template:** Problem-Solution Case Study
+
 **Versions covered:** Ubuntu 24.04 host, VirtualBox (Oracle's repository build), BusyBox 1.36.1, GRUB 2.12
 **Reading time:** ~8 minutes
 **Repo:** [github.com/samburwood23/kickflipOS](https://github.com/samburwood23/kickflipOS)
@@ -85,7 +84,7 @@ The first bug blocked everything. The second is the kind that survives for month
 silent failure in a boot script looks exactly like success unless you know what "right" should
 look like. The third cost the most time for the least reason.
 
-### What We Tried First (and Why It Failed)
+### What I Tried First (and Why It Failed)
 
 - **For the font**, the first plan used BusyBox's `setfont` applet, because BusyBox "has
   everything". The build ran fine and the ISO booted fine. Nothing told us the command didn't
@@ -111,7 +110,7 @@ look like. The third cost the most time for the least reason.
 
 ---
 
-## Our Solution
+## The Solution
 
 ### Approach
 
@@ -270,51 +269,3 @@ The ISO built on your machine will differ slightly, because it uses whichever ke
 - [Linux From Scratch](https://www.linuxfromscratch.org): the deep end
 - [The KickflipOS repo](https://github.com/samburwood23/kickflipOS): `./build.sh`, boot, type `skate`
 
-*What's the most fun "useless" project you've built? Tell me in the comments.*
-
----
-
-## LinkedIn Post (to share the article)
-
-> I built a tiny Linux OS that boots in VirtualBox. It's skateboard-themed. 🛹
->
-> KickflipOS boots to a skater mascot called Ollie and comes with a terminal skate game: chain
-> tricks, push your luck, bank your combo before you bail.
->
-> The surprise was how little an OS needs to be. Mine is the kernel I was already running, one
-> BusyBox binary and about 260 lines of shell. At boot, the kernel unpacks one archive into RAM
-> and runs one script. That script *is* the operating system.
->
-> The bugs taught me the most:
->
-> 🔧 VirtualBox wouldn't install. Ubuntu's packaged version was too old to build its kernel module
-> for my newer kernel. Fix: install from Oracle's own repository.
->
-> 🔤 The custom font failed silently. Ubuntu's BusyBox doesn't include the font loader, and my boot
-> script sent errors to /dev/null, so nothing complained. Fix: bundle the real tool plus the one
-> library it needs.
->
-> 📸 The first boot "worked", but a screenshot showed a prompt with no username. A from-scratch OS
-> has no /etc/passwd until you write one.
->
-> Lesson: check what's actually in the thing you built, not what you assume is there.
->
-> I built it vibe coding with an AI assistant. Full write-up and code in the comments.
->
-> What's the most fun "useless" project you've built? 👇
->
-> #Linux #VibeCoding #OpenSource #LearningInPublic
-
----
-
-### Publishing Checklist
-
-- [x] TL;DR states the surprising finding up front
-- [x] Error messages copied verbatim from the actual terminal output
-- [x] Metrics paired with how they were measured
-- [x] "What we tried first" covers the failed approaches
-- [x] Lessons tied to specific moments in this project
-- [ ] Check "an afternoon" matches how long it actually took you
-- [ ] Add your own VirtualBox screenshots (the game screen is the most eye-catching)
-- [ ] Make the kickflipOS repo public before sharing the link
-- [ ] Technical review
