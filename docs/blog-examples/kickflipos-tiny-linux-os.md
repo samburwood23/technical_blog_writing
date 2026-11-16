@@ -278,32 +278,29 @@ The ISO built on your machine will differ slightly, because it uses whichever ke
 
 > I built a tiny Linux OS that boots in VirtualBox. It's skateboard-themed. 🛹
 >
-> KickflipOS boots to a skater mascot called Ollie and comes with a terminal skate game: chain
-> tricks, push your luck, bank your combo before you bail.
+> KickflipOS is ~260 lines of shell and config on top of two borrowed binaries: my host's kernel and a static BusyBox. The boot chain:
 >
-> The surprise was how little an OS needs to be. Mine is the kernel I was already running, one
-> BusyBox binary and about 260 lines of shell. At boot, the kernel unpacks one archive into RAM
-> and runs one script. That script *is* the operating system.
+> GRUB → vmlinuz → initramfs (gzipped cpio, newc format) unpacked into a RAM-backed rootfs → kernel execs /init as PID 1
 >
-> The bugs taught me the most:
+> /init is a 24-line ash script. It runs busybox --install to create ~300 applet symlinks, mounts proc, sysfs and devtmpfs, rewrites the console palette with ESC]P escape codes, then execs an interactive shell. No systemd, no package manager, no disk. The whole OS is a 2.2 MB initramfs; the 15 MB kernel is most of the ISO.
 >
-> 🔧 VirtualBox wouldn't install. Ubuntu's packaged version was too old to build its kernel module
-> for my newer kernel. Fix: install from Oracle's own repository.
+> Three bugs taught me the most:
 >
-> 🔤 The custom font failed silently. Ubuntu's BusyBox doesn't include the font loader, and my boot
-> script sent errors to /dev/null, so nothing complained. Fix: bundle the real tool plus the one
-> library it needs.
+> 🔧 virtualbox-dkms failed with "Bad return status for module build on kernel: 7.0.0-42-generic". Ubuntu 24.04 ships VirtualBox 7.0.16, which predates the 7.0 kernel series, so the out-of-tree vboxdrv module won't compile against the newer kernel APIs. Fix: Oracle's repository, whose current release supports newer kernels.
 >
-> 📸 The first boot "worked", but a screenshot showed a prompt with no username. A from-scratch OS
-> has no /etc/passwd until you write one.
+> 🔤 The console font silently never loaded. Ubuntu's busybox-static is compiled without the setfont applet, and my init sent stderr to /dev/null. Fix: ldd showed kbd's setfont only needs libc.so.6 and ld-linux, so build.sh copies the binary plus whatever ldd reports into the rootfs at the same paths.
 >
-> Lesson: check what's actually in the thing you built, not what you assume is there.
+> 📸 The first boot printed "@kickflip:~". ash expands \u in PS1 by looking up the UID in /etc/passwd, and a from-scratch rootfs doesn't have one. One line fixed it: root:x:0:0:root:/root:/bin/sh
 >
-> I built it vibe coding with an AI assistant. Full write-up and code in the comments.
+> How we tested: boot the ISO headless in QEMU, type commands with the monitor's sendkey, capture frames with screendump. The screenshots caught bugs the exit codes never would.
 >
-> What's the most fun "useless" project you've built? 👇
+> Takeaway: before you send a command's errors to /dev/null in a boot script, check it exists in the image you built. busybox --list would have caught this in a second.
 >
-> #Linux #VibeCoding #OpenSource #LearningInPublic
+> Built vibe coding with an AI assistant. Write-up and source in the comments.
+>
+> What's the smallest thing you'd still call an operating system? 👇
+>
+> #Linux #OperatingSystems #BusyBox #EmbeddedLinux #VibeCoding #OpenSource
 
 ---
 
